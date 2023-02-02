@@ -5,7 +5,7 @@
 ***
 ## JAVA 란?
 ```
-JAVA는 객체지향 프로그래밍 언어(Object Operation Programming Language)로,
+JAVA는 객체지향 프로그래밍 언어(Object Oriented Programming Language)로,
 JAVA Virtual Machine을 통해 
 
 ```
