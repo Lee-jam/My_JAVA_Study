@@ -1,4 +1,4 @@
-package study_review;
+package review;
 
 import java.util.Scanner;
 //은행업무 만들기
@@ -107,6 +107,7 @@ public class Account {
 			}
 			case 4: {
 				bank = false;
+				System.out.println("은행 업무를 종료합니다.");
 				break;
 			}
 			default:
