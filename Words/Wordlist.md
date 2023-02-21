@@ -57,3 +57,4 @@ A를 instance화 한 것이 K*/
 - 인터프리터 : 
 - IDE : Intergrated Development Enviorment 통합 개발 환경
 - SDK : Software Development Kit 소프트웨어 개발 킷(언어, 컴파일러 등 개발에 필요한 것들이 통합으로 있는 키트)
+- transation : 업무 한개의 큰 단위
