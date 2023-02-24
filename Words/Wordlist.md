@@ -58,3 +58,9 @@ A를 instance화 한 것이 K*/
 - IDE : Intergrated Development Enviorment 통합 개발 환경
 - SDK : Software Development Kit 소프트웨어 개발 킷(언어, 컴파일러 등 개발에 필요한 것들이 통합으로 있는 키트)
 - transation : 업무 한개의 큰 단위
+- delimiter : 구분자
+- prefix :
+- suffix :
+- stateful : 상태를 기억하고 있는 것 (서버에 무리를 줌.)
+- stateless : 요청 시마다 상태정보를 전달 (로드밸런싱이나 스케일 아웃에 용이)
+- 참조하다 : 주소값을 갖다? 가져오다?
