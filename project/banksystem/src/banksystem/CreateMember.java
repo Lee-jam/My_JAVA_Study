@@ -1,6 +1,7 @@
 package banksystem;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -10,22 +11,26 @@ import java.util.Set;
  */
 
 public class CreateMember {
-	FileInputStream fis;
+	TableInterface tif = new TableInterface();
+	private ArrayList<String> idlist = tif.getIdList();
+	private ArrayList<String> maillist = tif.getMailList();
 	String name;
 	String id;
 	String pw;
 	String mail;
-	Set<String> memData = new HashSet<String>();
-	Set<String> mailData = new HashSet<String>();
+	private boolean create_access;
 	Scanner scan = new Scanner(System.in);
 	
 	public void createMem() {
 		inputName();
-		//엑셀에 포맷에 맡게 데이터 생성되도록 인풋
-		System.out.println("이름 :"+name+"\n"
-				+ "id : "+id+"\n"
-				+ "pw : "+pw+"\n"
-				+ "mail : "+mail);
+		//엑셀에 포맷에 맡게 데이터 생성되도록 인풋되도록 구현
+		if(create_access) {
+			System.out.println("이름 :"+name+"\n"
+					+ "id : "+id+"\n"
+					+ "pw : "+pw+"\n"
+					+ "mail : "+mail);
+			tif.excelUpdate(name, id, pw, mail);
+		}
 	}
 	
 	private void inputName() {
@@ -52,7 +57,7 @@ public class CreateMember {
 			inputId();
 		}
 		
-		if(memData.contains(inputid)) {
+		if(idlist.contains(inputid)) {
 			System.out.println("중복된 아이디입니다.");
 			inputId();
 		}
@@ -76,21 +81,23 @@ public class CreateMember {
 			inputPW();
 		}
 	}
-	private void inputMail() {
+	private boolean inputMail() {
 		System.out.println("이메일을 입력하세요. :");
 		String inputmail = scan.nextLine();
 		if(!inputmail.matches("[a-z0-9]+@[a-z0-9.]+$")) {
 			System.out.println("잘못된 메일 형식입니다.");
 			inputMail();
+			return false;
 		}
-		else if(mailData.contains(inputmail)) {
+		else if(maillist.contains(inputmail)) {
 			System.out.println("이미 회원가입된 이메일입니다.");
 			inputMail();
+			return false;
 		}
 		else {
 			mail = inputmail;
 			System.out.println("사용가능한 이메일입니다.");
-			Input
+			return create_access=true;
 		}
 	}
 	
