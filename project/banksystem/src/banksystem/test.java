@@ -20,12 +20,13 @@ public class test {
 		String[] str = {"Account_Num","Money","Account_pw","Limit_money","Limit_dod"};
 		XSSFSheet a=null;
 		XSSFWorkbook hs = new XSSFWorkbook(test);
-		a = hs.getSheet(hs.getSheetName(0));
+		a = hs.getSheet("ddo35@naver.om");
 		a.getRow(1).createCell(5).setCellValue("6");
 		FileOutputStream fos = new FileOutputStream(path);
 		hs.write(fos);
-		a.
-		System.out.println(a.getRow(a.dele);
+		System.out.println(a.isRowBroken(7));
+		a.removeRowBreak(7);
+//		System.out.println(a.getRow(a.dele);
 //		a.removeRowBreak(2);
 //		a.
 		
