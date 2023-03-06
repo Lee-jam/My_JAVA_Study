@@ -1,19 +1,26 @@
 package banksystem;
 
+
 import java.util.Scanner;
 
 public class ConsolePage{
-	private AccountInfo acc = new AccountInfo();
-	private MemTableInterface tif;
+	private Account accountFunc = new Account();
+//	private MemTableInterface mtif = new MemTableInterface();
 	private Scanner scan = new Scanner(System.in);
 	private int count = 0;
 	private String resent_id;
+	CreateMember a = new CreateMember();
 	
 	public ConsolePage() {
+		accountFunc.excelLoad();
+		accountFunc.excelAccountLoad();
+//		System.out.println(accountFunc.getAcc_numList());
 		loopPage();
 	}
 	void loopPage() {
-		logIn();
+		if(count==0) {
+			logIn();			
+		}
 		if(count==1) {
 			mainPage(resent_id);
 		}
@@ -23,7 +30,12 @@ public class ConsolePage{
 		while(count == 0){
 			System.out.println("=====환영합니다 호갱님======");
 			System.out.println("=1.로그인 2.회원 가입 3.종료=");
-			int select = scan.nextInt();
+			System.out.print("======메뉴를 선택해 주세요 : ");
+			int select = 0;
+			try {
+				select = scan.nextInt();
+			}catch(IndexOutOfBoundsException e) {}
+			
 			switch (select) {
 				case 1: {
 					Login a = new Login();
@@ -34,12 +46,15 @@ public class ConsolePage{
 					break;
 				}
 				case 2: {
-					new CreateMember().createMem();
+					System.out.println("=======회원가입을 페이지로 이동합니다.======");
+					a.createMem();
 					System.out.println("회원 가입이 완료되었습니다!");
 					System.out.println("바로 로그인 하시겠습니까?(Y/N)");
 					String sel = scan.next().toUpperCase();
 					if(sel.equals("Y")) {
-						select = 1;
+						resent_id = a.getCreateId();
+						count = 1;
+						break;
 						//로그인 바로 하는 메서드?생성자? 만들기
 					}
 					else if(sel.equals("N")){
@@ -55,20 +70,27 @@ public class ConsolePage{
 	}
 	private void mainPage(String resent_id) {
 		while(count == 1) {
+			System.out.println("===== 환영합니다. "+accountFunc.getNameList().get(accountFunc.getIdList().indexOf(resent_id))+" 고객님! =====");
 			System.out.print("1.계좌 조회 2. 계좌 이체 3.계좌 생성\n"
 							+ "4.계좌 삭제 5.한도금액 설정 6.내정보 조회\n"
 							+ "7로그 아웃\n");
 			System.out.print("메뉴를 선택하세요. :");
 			int select = scan.nextInt();
+			if(!accountFunc.getAcc_idList().contains(resent_id)) {
+				System.out.println("계좌가 존재하지않습니다. 계좌 생성으로 이동합니다.");
+				select = 3;
+			}
+			try {
+				
 			switch (select) {
 				case 1: {
 					//계좌 조회
-					new Account(0).memberAccountInfo(resent_id);
+					accountFunc.memberAccountInfo(resent_id);
 					break;
 				}
 				case 2: {
 					//계좌 이체
-					if(new Account(0).accountTransfer(resent_id))
+					if(accountFunc.accountTransfer(resent_id))
 						System.out.println("이체 성공!");
 					else System.out.println("이체 실패...");
 					
@@ -77,21 +99,22 @@ public class ConsolePage{
 				}
 				case 3: {
 					//계좌 생성
-					new Account(resent_id);
+					accountFunc.createAccount(resent_id);
 					break;
 				}
 				case 4: {
 					//계좌 삭제
+					accountFunc.accountRemoveProcess(resent_id);
 					break;
 				}
 				case 5: {
 					//한도금액 설정
-					new Account(0).AccountLimitSet(resent_id);
+					accountFunc.AccountLimitSet(resent_id);
 					break;
 				}
 				case 6: {
 					//내정보 조회
-					new Account(0).myInfo(resent_id);
+					accountFunc.myInfo(resent_id);
 					break;
 				}
 				case 7: {
@@ -100,7 +123,12 @@ public class ConsolePage{
 					loopPage();
 					break;
 				}
+				default: {
+					System.out.println("잘못된 접근입니다.");
+					break;
+				}
 			}
+			}catch(IndexOutOfBoundsException e) {}
 		}
 	}
 }

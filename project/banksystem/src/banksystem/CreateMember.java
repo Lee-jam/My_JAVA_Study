@@ -21,6 +21,10 @@ public class CreateMember {
 	private boolean create_access;
 	private Scanner scan = new Scanner(System.in);
 	
+	String getCreateId() {
+		return id;
+	}
+	
 	public void createMem() {
 		inputName();
 		//엑셀에 포맷에 맡게 데이터 생성되도록 인풋되도록 구현

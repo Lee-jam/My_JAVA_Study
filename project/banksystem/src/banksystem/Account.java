@@ -1,6 +1,7 @@
 package banksystem;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,16 +15,18 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Account extends MemTableInterface{
 	private String[] accountMain = {"Account_id","Account_Num","Money","Account_pw","Limit_money","Limit_dod"};
-	private String path = "D:\\My_JAVA_Study\\My_JAVA_Study\\project\\banksystem\\data\\계좌정보관리.xlsx";
+	private String path = "../banksystem/data/계좌정보관리.xlsx";
 	
 	//계좌 정보 저장 변수
-	private static ArrayList<String> acc_idList = new ArrayList<>(); 	//0sheet 0 Row : (1~x)column(Cell)
-	private static ArrayList<String> acc_numList = new ArrayList<>();		//0sheet 1 Row : (1~x)column(Cell)
-	private static ArrayList<String> acc_moneyList = new ArrayList<>();		//0sheet 2 Row
-	private static ArrayList<String> acc_pwList = new ArrayList<>();		//0sheet 3 Row
-	private static ArrayList<String> acc_limitList = new ArrayList<>();
-	private static ArrayList<String> acc_dodList = new ArrayList<>();
+	private ArrayList<String> acc_idList = new ArrayList<>(); 	//0sheet 0 Row : (1~x)column(Cell)
+	private ArrayList<String> acc_numList = new ArrayList<>();		//0sheet 1 Row : (1~x)column(Cell)
+	private ArrayList<String> acc_moneyList = new ArrayList<>();		//0sheet 2 Row
+	private ArrayList<String> acc_pwList = new ArrayList<>();		//0sheet 3 Row
+	private ArrayList<String> acc_limitList = new ArrayList<>();
+	private ArrayList<String> acc_dodList = new ArrayList<>();
 	
+	
+
 	//계좌 관련 멤버변수
 	String account_num="";
 	long convert;
@@ -34,37 +37,22 @@ public class Account extends MemTableInterface{
 	int count;
 	boolean sucess_state;
 	String select;
+	String AccName = "계좌정보";
 	//엑셀 관련 멤버변수
-//	XSSFWorkbook xwb;
-//	FileOutputStream fos;
+	Excelupload ex = new Excelupload();
+
 	
 	Scanner scan = new Scanner(System.in);
 	
-	//메서드 사용하기 위한 생성자
-	public Account(int state) {
-		//1일 경우 계좌관리 엑셀 로드
-		if(state == 1) {
-			try {
-				excelAccountLoad();			
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	//계좌생성 생성자
-	public Account(String id) {
-		System.out.println("=======계좌를 생성합니다.=======");
-		createAccSpace(id);
-	}
 	
 	//계좌 시트 생성
 	void createAccSpace(String id) {
+		System.out.println("=======계좌를 생성합니다.=======");
 		XSSFSheet accsheet;
 		try {
 			FileInputStream fis = new FileInputStream(path);
 			XSSFWorkbook xwb = new XSSFWorkbook(fis);
-			accsheet =  xwb.getSheet("계좌정보");
+			accsheet =  xwb.getSheet(AccName);
 			/*시트 생성할 때 다시 만들기
 //			if(accsheet==null) {
 //				System.out.println("process1");
@@ -93,7 +81,9 @@ public class Account extends MemTableInterface{
 	
 	//계좌번호 랜덤생성 000000 00 000000
 	void createAccount(String id) {
+		account_num = "";
 		for(int i = 0; i<14;i++) {
+			
 			convert = new Random().nextInt(9);
 			String temp = Long.toString(convert);
 			account_num += temp;
@@ -129,8 +119,8 @@ public class Account extends MemTableInterface{
 		try {
 			FileInputStream fis = new FileInputStream(path);
 			XSSFWorkbook xwb = new XSSFWorkbook(fis);
-			XSSFSheet xsheet = xwb.getSheet("계좌정보");
-			System.out.println(xsheet);
+			XSSFSheet xsheet = xwb.getSheet(AccName);
+//			System.out.println(xsheet);
 			xsheet.createRow(xsheet.getLastRowNum()+1); // 다음줄 Row를 생성
 			
 			xsheet.getRow(xsheet.getLastRowNum()).createCell(0).setCellValue(id);
@@ -143,6 +133,7 @@ public class Account extends MemTableInterface{
 			FileOutputStream fos = new FileOutputStream(path);
 			xwb.write(fos);
 			
+
 			acc_idList.add(id);
 			acc_numList.add(account_num);
 			acc_moneyList.add(money);
@@ -160,36 +151,47 @@ public class Account extends MemTableInterface{
 		catch(Exception e) {
 			
 		}
+		memberTierSet(id);
 	}
 	//엑셀에 계좌 업데이트
-	void excelAccountLoad() throws Exception{
-		FileInputStream test = new FileInputStream(path);
-		XSSFWorkbook xwb = new XSSFWorkbook(test);
-		XSSFSheet a = xwb.getSheet("계좌정보");
+	void excelAccountLoad(){
+		FileInputStream test= null;
+		XSSFWorkbook xwb = null;
+		try {
+			test = new FileInputStream(path);
+			xwb = new XSSFWorkbook(test);
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+		}
+		XSSFSheet a = xwb.getSheet(AccName);
+		int count =0;
 		try {
 			
 			for(Row row:a) {
 				for(Cell c:row) {
 					if(c.getColumnIndex()==0){
-						this.acc_idList.add(c.getStringCellValue());
+						this.acc_idList.add(count,c.getStringCellValue());
 					}
 					else if(c.getColumnIndex()==1){
-						this.acc_numList.add(c.getStringCellValue());
+						this.acc_numList.add(count,c.getStringCellValue());
 					}
 					else if(c.getColumnIndex()==2){
-						this.acc_moneyList.add(c.getStringCellValue());
+						this.acc_moneyList.add(count,c.getStringCellValue());
 					}
 					else if(c.getColumnIndex()==3){
-						this.acc_pwList.add(c.getStringCellValue());
+						this.acc_pwList.add(count,c.getStringCellValue());
 					}					
 					else if(c.getColumnIndex()==4){
-						this.acc_limitList.add(c.getStringCellValue());
+						this.acc_limitList.add(count,c.getStringCellValue());
 					}
 					else if(c.getColumnIndex()==5){
-						this.acc_dodList.add(c.getStringCellValue());
+						this.acc_dodList.add(count,c.getStringCellValue());
 					}
 					
 				}
+				count++;
 			}
 //			System.out.println("0"+acc_idList.toString());
 			xwb.close();
@@ -198,19 +200,20 @@ public class Account extends MemTableInterface{
 			}
 		catch(Exception e) {
 			System.out.println("out_account");
+			e.printStackTrace();
 		}
 	}
 	//계좌 조회
 	void memberAccountInfo(String id){
 		count = 0;
-		int num = 0;
+		int num = -1;
 		System.out.println("============보유하신 계좌 목록============");
-//		System.out.println("1"+this.acc_idList.toString());
 		for(String ids : this.acc_idList) {
 			if(id.equals(ids)) {
 				num++;
 				System.out.println(num+" 계좌번호 : "+this.acc_numList.get(count)+"|| 보유금액 : "+this.acc_moneyList.get(count));
 			}
+			else if(!id.equals(ids))num++;
 			if(num==0&&count==acc_idList.size()-1) {
 				System.out.println("보유하신 계좌가 존재하지 않습니다.");
 			}
@@ -220,59 +223,52 @@ public class Account extends MemTableInterface{
 	//tier 설정
 	void memberTierSet(String id) {
 		count = 0;
-		Long total = null;
+		Long total = 0l;
 		for(String ids : this.acc_idList) {
 			if(id.equals(ids)) {
-				total = Long.parseLong(acc_moneyList.get(count));
+				total += Long.parseLong(acc_moneyList.get(count));
 			}
 			count++;
 		}
+		System.out.println("총금액 : "+total);
 		//계좌 총액이 1000만원 이상일 경우 VIP || 아니면 Normal
 		if(total>=10000000) {
 			tierUpdate(id, "VIP");
-			new Account(1);
+			try {
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else if(total<10000000&&total>0) {
 			tierUpdate(id, "Normal");
-			new Account(1);
+			try {
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
-	//금액 변경 설정
-	void updateMoney(String accountNum, long money) {
-		String tomoney = Long.toString(money);
-		try{
-			FileInputStream fis = new FileInputStream(path);
-			XSSFWorkbook xwb = new XSSFWorkbook(fis);
-			XSSFSheet xsheet = xwb.getSheet("계좌정보");
-			xsheet.getRow(acc_numList.indexOf(accountNum)).createCell(2).setCellValue(tomoney);
-			FileOutputStream fos = new FileOutputStream(path);
-			xwb.write(fos);			
-			acc_moneyList.set(acc_numList.indexOf(accountNum), tomoney);
-			fos.flush();
-			fos.close();
-			xwb.close();
-			fis.close();
-		}catch(IOException e) {System.out.println(1);}
-		catch(IndexOutOfBoundsException e) {}
+	//보내는 사람 금액 변경 설정
+	void updateMoney(String id, String accountNum, long money, long dod_money) {
+		String tomoney = Long.toString(money-dod_money);
+		long existdod = getAccountValue(acc_dodList, acc_numList.indexOf(accountNum));
+		
+		ex.excelUpdate(path, AccName, acc_numList.indexOf(accountNum), 2, tomoney);
+		ex.excelUpdate(path, AccName, acc_numList.indexOf(accountNum), 5, Long.toString(dod_money+existdod));
+
+		acc_moneyList.set(acc_numList.indexOf(accountNum), tomoney);
+		acc_dodList.set(acc_numList.indexOf(accountNum), Long.toString(dod_money+existdod));
+		
 	}
-	//상대 금액 변경 설정
-	void fromupdateMoney(String accountNum, long money) {
+	//받는 사람 금액 변경 설정
+	void fromupdateMoney(String id, String accountNum, long money) {
 		Long existMoney = Long.parseLong(acc_moneyList.get(acc_numList.indexOf(accountNum)));
 		String tomoney = Long.toString(money+existMoney);
-		try{
-			FileInputStream fis = new FileInputStream(path);
-			XSSFWorkbook xwb = new XSSFWorkbook(fis);
-			XSSFSheet xsheet = xwb.getSheet("계좌정보");
-			xsheet.getRow(acc_numList.indexOf(accountNum)).createCell(2).setCellValue(tomoney);
-			FileOutputStream fos = new FileOutputStream(path);
-			xwb.write(fos);			
-			acc_moneyList.set(acc_numList.indexOf(accountNum), tomoney);
-			fos.flush();
-			fos.close();
-			xwb.close();
-			fis.close();
-		}catch(IOException e) {System.out.println(1);}
-		catch(IndexOutOfBoundsException e) {}
+		ex.excelUpdate(path, AccName, acc_numList.indexOf(accountNum), 2, tomoney);
+
+		acc_moneyList.set(acc_numList.indexOf(accountNum), tomoney);
+		
 	}
 	//한도금액 설정
 	//한도를 알려면 해당 id 한도리스트에서 인덱스 값에 위치한 현재 한도를 받아옴. 티어도 동일
@@ -282,35 +278,31 @@ public class Account extends MemTableInterface{
 		memberAccountInfo(id);
 		System.out.println("한도를 설정할 계좌를 선택해주세요.");
 		int select = scan.nextInt();
-		if(select>acc_numList.size()) {
+		if(select>acc_numList.size()||id.equals(acc_idList.get(select))) {
 			System.out.println("잘못된 접근입니다. 다시 시도해주세요.");
 			AccountLimitSet(id);
 		}
-		long now_limit = Long.parseLong(acc_limitList.get(select));
+		long now_limit = getAccountValue(acc_limitList,select);
 		String now_tier = getTierList().get(getIdList().indexOf(id));
 		System.out.println("선택하신 계좌의 현재 한도 : "+now_limit+"원"
 						+"\n고객님의 등급 : "+now_tier+"등급");
-		System.out.println("한도금액을 설정하세요.");
+		System.out.println("설정하실 한도금액을 입력하세요.");
 		long set = scan.nextLong();
-		if(now_tier.equals("Normal")&&now_limit>=10000000) {
+		System.out.print("비밀번호 입력 :");
+		String pw = scan.next();
+		
+		if(!acc_pwList.get(select).equals(pw)) {
+			System.out.println("비밀번호가 맞지않습니다.");
+		}
+
+		else if(now_tier.equals("Normal")&&set>=10000000) {
 			System.out.println(set+"원은 고객님의 등급에서는 설정할 수 없는 한도 금액입니다.");
 		}
 		else {
-			try{
-				FileInputStream fis = new FileInputStream(path);
-				XSSFWorkbook xwb = new XSSFWorkbook(fis);
-				XSSFSheet xsheet = xwb.getSheet(xwb.getSheetName(0));
-				xsheet.getRow(select).createCell(4).setCellValue(Long.toString(set));
-				FileOutputStream fos = new FileOutputStream(path);
-				xwb.write(fos);			
-				acc_limitList.set(select, Long.toString(set));
-				fos.flush();
-				fos.close();
-				xwb.close();
-				fis.close();
-				System.out.println(set+"원으로 고객님의 한도가 변경되었습니다.");
-			}catch(IOException e) {System.out.println(1);}
-			catch(IndexOutOfBoundsException e) {}
+			ex.excelUpdate(path, AccName, select, 4, Long.toString(set));
+			
+			acc_limitList.set(select, Long.toString(set));
+			System.out.println(set+"원으로 고객님의 한도가 변경되었습니다.");
 
 		}
 	}
@@ -326,9 +318,15 @@ public class Account extends MemTableInterface{
 		System.out.println("보내실 고객님의 계좌를 선택해주세요.");
 		memberAccountInfo(id);
 		int a = scan.nextInt(); //선택 계좌랑 비밀번호 인덱스와 같음.
-		Long my_money = Long.parseLong(acc_moneyList.get(a));
-		Long my_limit = Long.parseLong(acc_limitList.get(a));
-		System.out.println(my_money);
+		if(!acc_idList.get(a).equals(id)) {
+			//굉장히 비 효율적 코드인듯
+			while(!acc_idList.get(a).equals(id)) {
+				a++;
+			}
+		}
+		Long my_money = getAccountValue(acc_moneyList,a);
+		Long my_limit = getAccountValue(acc_limitList,a);
+//		System.out.println(my_money);
 		
 		if(!acc_numList.contains(num)) {
 			System.out.print("입력하신 계좌는 없는 계좌입니다. (Y.다시입력 N.뒤로가기):");
@@ -360,19 +358,18 @@ public class Account extends MemTableInterface{
 			
 			System.out.println("예금주 :"+getNameList().get(index)+"님에게 "+mon+"원을 이체하시겠습니까?");
 			select =scan.next().toUpperCase();
-			System.out.println(1);
+//			System.out.println(1);
 			if(select.equals("Y")) {
+//				System.out.println(acc_pwList.toString());
+//				System.out.println(index);
 				System.out.print("비밀번호 입력 :");
-				System.out.println(acc_pwList.toString());
-				System.out.println(index);
 				String pw = scan.next();
 				if(acc_pwList.get(a).equals(pw)) {
 					System.out.println("예금주 :"+getNameList().get(index)+"님에게 "+mon+"원을 이체합니다.");
-					
-					my_money -= mon;
-					
-					updateMoney(acc_numList.get(a), my_money);
-					fromupdateMoney(num, mon);
+
+					updateMoney(id, acc_numList.get(a), my_money, mon);
+					fromupdateMoney(id, num, mon);
+					memberTierSet(id);
 					sucess_state = true;
 				}
 				else {
@@ -392,24 +389,74 @@ public class Account extends MemTableInterface{
 		
 	}
 	
+	//계좌 삭제 프로세스
+	void accountRemoveProcess(String id) {
+		memberAccountInfo(id);
+		System.out.println("===================계좌 삭제===================");
+		System.out.println("삭제하실 계좌를 선택해주세요");
+		int choice1 = scan.nextInt();
+		if(!acc_idList.get(choice1).equals(id)) {
+			//굉장히 비 효율적 코드인듯
+			while(!acc_idList.get(choice1).equals(id)) {
+				choice1++;
+			}
+		}
+		Long my_money = getAccountValue(acc_moneyList,choice1);
+		if(my_money>0) {
+			System.out.println("계좌에 잔액이 남아있습니다. 받으실 계좌를 선택해주세요.");
+			int choice2 = scan.nextInt();
+			if(!acc_idList.get(choice1).equals(acc_idList.get(choice2))) {
+				//굉장히 비 효율적 코드인듯
+				while(!acc_idList.get(choice1).equals(acc_idList.get(choice2))) {
+					choice2++;
+				}
+			}
+			if(choice2==choice1) System.out.println("같은 계좌를 선택하셨습니다.\n 메인화면으로 이동합니다.");
+			else{
+				System.out.print("비밀번호 입력 :");
+				String pw = scan.next();
+				if(acc_pwList.get(choice1).equals(pw)) {
+					fromupdateMoney(id, acc_numList.get(choice2), my_money);
+				}
+			}
+		}
+		accountRemove(id, choice1);
+		System.out.println("계좌가 성공적으로 삭제되었습니다.");
+		memberTierSet(id);
+	}
 	//계좌 삭제
-	void accountRemoveAll() {
+	void accountRemove(String id, int index) {
+		ex.exceldelete(path, AccName, index);
 		
+		acc_moneyList.remove(index);
+		acc_dodList.remove(index);
+		acc_idList.remove(index);
+		acc_limitList.remove(index);
+		acc_numList.remove(index);
+		acc_pwList.remove(index);
 	}
 	
 	//내정보 조회
 	
 	void myInfo(String id){
-		System.out.println("===============");
+		System.out.println("========내 정보 조회========");
 		System.out.println("이름 : "+getNameList().get(getIdList().indexOf(id)));
 		System.out.println("아이디 : "+id);
+		System.out.println("이메일 : "+getMailList().get(getIdList().indexOf(id)));
 		System.out.println("등급 : "+getTierList().get(getIdList().indexOf(id)));
-		memberAccountInfo(id);
+		System.out.println("=========================");
 		
 		
 	}
 	
+	long getAccountValue(ArrayList<String> Account,int index) {
+		return Long.parseLong(Account.get(index));
+	}
 	//타 은행 계좌 이체는 나중에
-		
+
+	public ArrayList<String> getAcc_idList() {
+		return acc_idList;
+	}
+	
 }
 

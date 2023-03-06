@@ -20,8 +20,8 @@ public class MemTableInterface {
 	private static ArrayList<String> mailList = new ArrayList<>(5);		//0sheet 3 Row
 	private static ArrayList<String> tierList = new ArrayList<>(5);		//
 	private static ArrayList<String> errList = new ArrayList<>(5);
-	private static ArrayList<String> accountList = new ArrayList<>();	//
-	private String path = "D:\\My_JAVA_Study\\My_JAVA_Study\\project\\banksystem\\data\\회원정보관리.xlsx";
+
+	private String path = "../banksystem/data/회원정보관리.xlsx";
 	//	XSSFWorkbook xwb = null;
 	
 	public MemTableInterface() {
@@ -36,9 +36,19 @@ public class MemTableInterface {
 		}
 	}
 	
-	void excelLoad() throws Exception{
-		FileInputStream test = new FileInputStream(path);
-		XSSFWorkbook xwb = new XSSFWorkbook(test);
+	void excelLoad() {
+		FileInputStream test = null;
+		try {
+			test = new FileInputStream(path);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		XSSFWorkbook xwb = null;
+		try {
+			xwb = new XSSFWorkbook(test);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		XSSFSheet a = xwb.getSheet("회원정보");
 		int count =0;
 		try {
@@ -68,13 +78,19 @@ public class MemTableInterface {
 				}
 				count++;
 			}
-			System.out.println(nameList.toString());
-			System.out.println(idList.toString());
-			System.out.println(pwList.toString());
-			System.out.println(mailList.toString());
-			System.out.println(errList.toString());
-			xwb.close();
-			test.close();
+//			System.out.println(nameList.toString());
+//			System.out.println(idList.toString());
+//			System.out.println(pwList.toString());
+//			System.out.println(mailList.toString());
+//			System.out.println(errList.toString());
+			try {
+				xwb.close();
+				test.close();
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+			
 		}catch(NullPointerException e) {
 			System.out.println("out");
 			}
@@ -127,22 +143,23 @@ public class MemTableInterface {
 			}
 			FileOutputStream fos = new FileOutputStream(path);
 			xwb.write(fos);
-			
-			nameList.add(name);
-			idList.add(id);
-			pwList.add(pw);
-			mailList.add(mail);
-			errList.add("0");
-			
 			fos.flush();
 			fos.close();
 			xwb.close();
 			fis.close();
+			
 		}catch(IOException e) {System.out.println(1);}
 		catch(IndexOutOfBoundsException e) {}
+		
+		nameList.add(name);
+		idList.add(id);
+		pwList.add(pw);
+		mailList.add(mail);
+		errList.add("0");
 	}
 	//tier 업데이트
 	void tierUpdate(String id, String tier) {
+		
 		try{
 			FileInputStream fis = new FileInputStream(path);
 			XSSFWorkbook xwb = new XSSFWorkbook(fis);
@@ -150,13 +167,13 @@ public class MemTableInterface {
 			xsheet.getRow(idList.indexOf(id)).createCell(5).setCellValue(tier);
 			FileOutputStream fos = new FileOutputStream(path);
 			xwb.write(fos);			
-			tierList.set(idList.indexOf(id), tier); //아이디 값과 같은 인덱스 위치에 있는 티어 값을 업데이트
 			fos.flush();
 			fos.close();
 			xwb.close();
 			fis.close();
 		}catch(IOException e) {System.out.println(1);}
 		catch(IndexOutOfBoundsException e) {}
+
 
 	}
 //	public excelupdate(String path, String SheetName,ArrayList A,ArrayList B, String id)
@@ -199,11 +216,11 @@ public class MemTableInterface {
 	public void setErrList(ArrayList<String> errList) {
 		this.errList = errList;
 	}
-	public static ArrayList<String> getTierList() {
+	public ArrayList<String> getTierList() {
 		return tierList;
 	}
-	public static void setTierList(ArrayList<String> tierList) {
-		MemTableInterface.tierList = tierList;
+	public void setTierList(ArrayList<String> tierList) {
+		this.tierList = tierList;
 	}
 //	Writable
 }
