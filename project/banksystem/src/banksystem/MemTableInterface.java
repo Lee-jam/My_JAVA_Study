@@ -13,56 +13,84 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 /* 엑셀(DB 대신 사용)의 데이터를 ㄴ
  * 
  */
-public class TableInterface {
-	private ArrayList<String> nameList = new ArrayList<>(); 	//0sheet 0 Row : (1~x)column(Cell)
-	private ArrayList<String> idList = new ArrayList<>();		//0sheet 1 Row : (1~x)column(Cell)
-	private ArrayList<String> pwList = new ArrayList<>();		//0sheet 2 Row
-	private ArrayList<String> mailList = new ArrayList<>();		//0sheet 3 Row
-	private ArrayList<String> tierList = new ArrayList<>();		//
-	private ArrayList<String> errList = new ArrayList<>();
-	private ArrayList<String> accountList = new ArrayList<>();	//
-	private String path = "D:\\My_JAVA_Study\\My_JAVA_Study\\project\\banksystem\\data\\회원정보관리.xlsx";
+public class MemTableInterface {
+	private static ArrayList<String> nameList = new ArrayList<>(); 	//0sheet 0 Row : (1~x)column(Cell)
+	private static ArrayList<String> idList = new ArrayList<>();		//0sheet 1 Row : (1~x)column(Cell)
+	private static ArrayList<String> pwList = new ArrayList<>();		//0sheet 2 Row
+	private static ArrayList<String> mailList = new ArrayList<>(5);		//0sheet 3 Row
+	private static ArrayList<String> tierList = new ArrayList<>(5);		//
+	private static ArrayList<String> errList = new ArrayList<>(5);
+
+	private String path = "../banksystem/data/회원정보관리.xlsx";
 	//	XSSFWorkbook xwb = null;
 	
+	public MemTableInterface() {
+		
+	}
 	
-	public TableInterface() {
+	public MemTableInterface(int State) {
 		try {
 			excelLoad();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	void excelLoad() throws Exception{
-		FileInputStream test = new FileInputStream(path);
-		XSSFWorkbook xwb = new XSSFWorkbook(test);
-		XSSFSheet a = xwb.getSheetAt(0);
+	
+	void excelLoad() {
+		FileInputStream test = null;
+		try {
+			test = new FileInputStream(path);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		XSSFWorkbook xwb = null;
+		try {
+			xwb = new XSSFWorkbook(test);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		XSSFSheet a = xwb.getSheet("회원정보");
+		int count =0;
 		try {
 			
 			for(Row row:a) {
 				for(Cell c:row) {
 					if(c.getColumnIndex()==0){
-						nameList.add(c.getStringCellValue());
+						nameList.add(count,c.getStringCellValue());
 					}
 					else if(c.getColumnIndex()==1){
-						idList.add(c.getStringCellValue());
+						idList.add(count,c.getStringCellValue());
 					}
 					else if(c.getColumnIndex()==2){
-						pwList.add(c.getStringCellValue());
+						pwList.add(count,c.getStringCellValue());
 					}
 					else if(c.getColumnIndex()==3){
-						mailList.add(c.getStringCellValue());
-					}					
+						mailList.add(count,c.getStringCellValue());
+					}
 					else if(c.getColumnIndex()==4){
-						tierList.add(c.getStringCellValue());
+						errList.add(count,c.getStringCellValue());
 					}
 					else if(c.getColumnIndex()==5){
-						errList.add(c.getStringCellValue());
+						tierList.add(count,c.getStringCellValue());
 					}
 					
+					
 				}
+				count++;
 			}
-			xwb.close();
-			test.close();
+//			System.out.println(nameList.toString());
+//			System.out.println(idList.toString());
+//			System.out.println(pwList.toString());
+//			System.out.println(mailList.toString());
+//			System.out.println(errList.toString());
+			try {
+				xwb.close();
+				test.close();
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+			
 		}catch(NullPointerException e) {
 			System.out.println("out");
 			}
@@ -82,7 +110,7 @@ public class TableInterface {
 			FileInputStream fis = new FileInputStream(path);
 			XSSFWorkbook xwb = new XSSFWorkbook(fis);
 			XSSFSheet xsheet = xwb.getSheet(xwb.getSheetName(0));
-			xsheet.getRow(idList.indexOf(id)).createCell(5).setCellValue(error);
+			xsheet.getRow(idList.indexOf(id)).createCell(4).setCellValue(error);
 			FileOutputStream fos = new FileOutputStream(path);
 			xwb.write(fos);			
 			errList.set(idList.indexOf(id), error); //아이디 값과 같은 인덱스 위치에 있는 error 값을 업데이트
@@ -94,6 +122,8 @@ public class TableInterface {
 		catch(IndexOutOfBoundsException e) {}
 
 	}
+	
+	//Member를 엑셀에 업데이트 하면서 리스트에도 바로 추가해줘서 한번더 읽어오는 일 없도록 함.
 	void excelUpdate(String name,String id,String pw,String mail) {
 		try{
 			FileInputStream fis = new FileInputStream(path);
@@ -102,28 +132,52 @@ public class TableInterface {
 //			int loc = xsheet.getRow(0).getLastCellNum(); //컬럼 최대 길이 구하기
 			xsheet.createRow(xsheet.getLastRowNum()+1);
 			
-			for(int i=0;i<4;i++) {
+			for(int i=0;i<6;i++) {
 				if(i==0)xsheet.getRow(xsheet.getLastRowNum()).createCell(i).setCellValue(name);				
 				if(i==1)xsheet.getRow(xsheet.getLastRowNum()).createCell(i).setCellValue(id);				
 				if(i==2)xsheet.getRow(xsheet.getLastRowNum()).createCell(i).setCellValue(pw);				
-				if(i==3)xsheet.getRow(xsheet.getLastRowNum()).createCell(i).setCellValue(mail);				
+				if(i==3)xsheet.getRow(xsheet.getLastRowNum()).createCell(i).setCellValue(mail);
+				if(i==4)xsheet.getRow(xsheet.getLastRowNum()).createCell(i).setCellValue("0");
+				if(i==5)xsheet.getRow(xsheet.getLastRowNum()).createCell(i).setCellValue("Normal");
 							
 			}
 			FileOutputStream fos = new FileOutputStream(path);
 			xwb.write(fos);
+			fos.flush();
+			fos.close();
+			xwb.close();
+			fis.close();
 			
-			nameList.add(name);
-			idList.add(id);
-			pwList.add(pw);
-			mailList.add(mail);
-			
+		}catch(IOException e) {System.out.println(1);}
+		catch(IndexOutOfBoundsException e) {}
+		
+		nameList.add(name);
+		idList.add(id);
+		pwList.add(pw);
+		mailList.add(mail);
+		errList.add("0");
+	}
+	//tier 업데이트
+	void tierUpdate(String id, String tier) {
+		
+		try{
+			FileInputStream fis = new FileInputStream(path);
+			XSSFWorkbook xwb = new XSSFWorkbook(fis);
+			XSSFSheet xsheet = xwb.getSheet(xwb.getSheetName(0));
+			xsheet.getRow(idList.indexOf(id)).createCell(5).setCellValue(tier);
+			FileOutputStream fos = new FileOutputStream(path);
+			xwb.write(fos);			
 			fos.flush();
 			fos.close();
 			xwb.close();
 			fis.close();
 		}catch(IOException e) {System.out.println(1);}
 		catch(IndexOutOfBoundsException e) {}
+
+
 	}
+//	public excelupdate(String path, String SheetName,ArrayList A,ArrayList B, String id)
+	
 
 	public ArrayList<String> getNameList() {
 		return nameList;
@@ -162,6 +216,11 @@ public class TableInterface {
 	public void setErrList(ArrayList<String> errList) {
 		this.errList = errList;
 	}
-	
+	public ArrayList<String> getTierList() {
+		return tierList;
+	}
+	public void setTierList(ArrayList<String> tierList) {
+		this.tierList = tierList;
+	}
 //	Writable
 }

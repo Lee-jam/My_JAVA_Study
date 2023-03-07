@@ -11,15 +11,19 @@ import java.util.Set;
  */
 
 public class CreateMember {
-	TableInterface tif = new TableInterface();
+	private MemTableInterface tif = new MemTableInterface();
 	private ArrayList<String> idlist = tif.getIdList();
 	private ArrayList<String> maillist = tif.getMailList();
-	String name;
-	String id;
-	String pw;
-	String mail;
+	private String name;
+	private String id;
+	private String pw;
+	private String mail;
 	private boolean create_access;
-	Scanner scan = new Scanner(System.in);
+	private Scanner scan = new Scanner(System.in);
+	
+	String getCreateId() {
+		return id;
+	}
 	
 	public void createMem() {
 		inputName();
